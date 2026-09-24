@@ -1,0 +1,625 @@
+/* =========================================================
+   Proyecto: Repelente de mosquitos — 1.º BGU
+   Liceo Naval de Guayaquil «Cmdte. Rafael Andrade Lalama»
+   ========================================================= */
+
+:root {
+  /* Paleta */
+  --dusk: #16233a;       /* azul de atardecer — hora de mayor riesgo */
+  --dusk-suave: #22334f;
+  --moss: #5b6b3f;       /* verde citronela */
+  --amber: #e2a542;      /* ámbar de alerta */
+  --coral: #c1553c;      /* acento de advertencia, uso puntual */
+  --sand: #f4ede1;       /* fondo cálido, costa */
+  --sand-alt: #ece1cf;
+  --ink: #211c16;        /* texto principal */
+  --ink-suave: #55503f;
+
+  --fuente-titulo: "Fraunces", Georgia, "Times New Roman", serif;
+  --fuente-texto: "Work Sans", "Segoe UI", system-ui, sans-serif;
+
+  --radio: 14px;
+  --sombra: 0 18px 40px -22px rgba(22, 35, 58, 0.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+
+body {
+  margin: 0;
+  background: var(--sand);
+  color: var(--ink);
+  font-family: var(--fuente-texto);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+h1, h2, h3 {
+  font-family: var(--fuente-titulo);
+  color: var(--dusk);
+  margin: 0 0 0.5em;
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+p { margin: 0 0 1em; }
+em { font-style: italic; color: var(--moss); }
+strong { color: var(--dusk); }
+
+a { color: var(--dusk); }
+
+.contenedor {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.contenedor--angosta { max-width: 760px; }
+
+/* ---------- Barra de progreso ---------- */
+.barra-progreso {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--moss), var(--amber));
+  z-index: 1000;
+  transition: width 0.1s linear;
+}
+
+/* ---------- Encabezado ---------- */
+.encabezado {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: rgba(244, 237, 225, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(22, 35, 58, 0.1);
+}
+
+.encabezado__fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--dusk);
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+
+.marca__insignia { color: var(--coral); display: flex; }
+
+.nav-escritorio { display: flex; gap: 28px; }
+
+.nav-escritorio a {
+  text-decoration: none;
+  color: var(--ink-suave);
+  font-size: 0.95rem;
+  font-weight: 500;
+  position: relative;
+  padding: 4px 0;
+}
+
+.nav-escritorio a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 2px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.nav-escritorio a:hover::after { transform: scaleX(1); }
+.nav-escritorio a:hover { color: var(--dusk); }
+
+.boton-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.boton-menu span {
+  height: 2px;
+  background: var(--dusk);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.boton-menu[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.boton-menu[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.boton-menu[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.menu-movil {
+  position: fixed;
+  inset: 68px 0 0 0;
+  background: var(--dusk);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 4px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 400;
+}
+
+.menu-movil.abierto { transform: translateX(0); }
+
+.menu-movil a {
+  color: var(--sand);
+  text-decoration: none;
+  font-family: var(--fuente-titulo);
+  font-size: 1.3rem;
+  padding: 14px 4px;
+  border-bottom: 1px solid rgba(244, 237, 225, 0.12);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 64px 0 72px;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../img/patron-repelente.jpg");
+  background-repeat: repeat;
+  background-size: 280px auto;
+  background-position: top left;
+  opacity: 0.42;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(244, 237, 225, 0.25), var(--sand) 96%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero > .contenedor {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__centro {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero__centro .hero__titulo {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 20ch;
+}
+
+.hero__centro .hero__bajada {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero__centro .hero__botones {
+  justify-content: center;
+}
+
+.hero__etiqueta {
+  color: var(--moss);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+}
+
+.hero__titulo {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  max-width: 14ch;
+}
+
+.hero__bajada {
+  max-width: 52ch;
+  color: var(--ink-suave);
+  font-size: 1.05rem;
+}
+
+.hero__botones {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.boton {
+  display: inline-block;
+  padding: 13px 24px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.boton--relleno { background: var(--dusk); color: var(--sand); }
+.boton--relleno:hover { background: var(--dusk-suave); transform: translateY(-1px); }
+
+.boton--linea { border: 1.5px solid var(--dusk); color: var(--dusk); }
+.boton--linea:hover { background: rgba(22, 35, 58, 0.06); }
+
+/* ---------- Ficha del proyecto ---------- */
+.ficha-proyecto {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: left;
+  gap: 28px 40px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(22, 35, 58, 0.14);
+}
+
+.ficha-proyecto__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+}
+
+.ficha-proyecto__etiqueta {
+  font-size: 0.72rem;
+  color: var(--coral);
+  font-weight: 600;
+}
+
+.ficha-proyecto__valor {
+  font-family: var(--fuente-titulo);
+  color: var(--dusk);
+  font-size: 1.02rem;
+}
+
+/* ---------- Presentación del proyecto ---------- */
+.presentacion__grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 48px;
+  align-items: start;
+  margin-top: 8px;
+}
+
+.presentacion__texto p { color: var(--ink-suave); }
+
+.tarjeta-cita {
+  background: var(--sand-alt);
+  border-radius: var(--radio);
+  padding: 28px 26px;
+  box-shadow: var(--sombra);
+}
+
+.ilustracion-repelente {
+  width: 100%;
+  height: auto;
+  margin-bottom: 18px;
+}
+
+.tarjeta-cita__texto {
+  font-family: var(--fuente-titulo);
+  font-style: italic;
+  color: var(--dusk);
+  font-size: 1.15rem;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+
+.tarjeta-cita__autor {
+  margin: 0;
+  color: var(--ink-suave);
+  font-size: 0.85rem;
+}
+
+/* ---------- Secciones generales ---------- */
+.seccion { padding: 64px 0; }
+.seccion--tono { background: var(--sand-alt); }
+
+.seccion__eyebrow {
+  color: var(--coral);
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.seccion__titulo { font-size: clamp(1.6rem, 3vw, 2.1rem); max-width: 24ch; }
+
+.seccion__intro { max-width: 70ch; color: var(--ink-suave); }
+
+/* ---------- Tarjetas de enfermedad ---------- */
+.tarjetas-enfermedad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 28px 0 24px;
+}
+
+.tarjeta-enfermedad {
+  background: #fff;
+  border-left: 4px solid var(--coral);
+  border-radius: 6px;
+  padding: 20px 22px;
+  box-shadow: var(--sombra);
+}
+
+.tarjeta-enfermedad h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.tarjeta-enfermedad p { margin: 0; color: var(--ink-suave); font-size: 0.95rem; }
+
+/* ---------- Tabla de repelentes ---------- */
+.tabla-scroll { overflow-x: auto; margin: 28px 0 10px; }
+
+.tabla-repelentes {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+  background: #fff;
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.tabla-repelentes th, .tabla-repelentes td {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--sand-alt);
+}
+
+.tabla-repelentes thead th {
+  background: var(--dusk);
+  color: var(--sand);
+  font-family: var(--fuente-titulo);
+  font-weight: 500;
+}
+
+.tabla-repelentes tbody th {
+  color: var(--dusk);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla-repelentes tbody tr:last-child td,
+.tabla-repelentes tbody tr:last-child th { border-bottom: none; }
+
+.tabla-nota { color: var(--ink-suave); font-size: 0.88rem; }
+
+/* ---------- Pasos ---------- */
+.pasos { list-style: none; margin: 28px 0 0; padding: 0; }
+
+.paso {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 18px;
+  padding: 20px 0;
+  border-top: 1px solid rgba(22, 35, 58, 0.12);
+}
+
+.paso:first-child { border-top: none; }
+
+.paso__numero {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--dusk);
+  color: var(--amber);
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.paso h3 { font-size: 1.05rem; margin-bottom: 6px; }
+.paso p { margin: 0; color: var(--ink-suave); }
+
+/* ---------- Tarjetas por edad ---------- */
+.tarjetas-edad {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.tarjeta-edad {
+  background: #fff;
+  border-radius: var(--radio);
+  padding: 22px 24px;
+  box-shadow: var(--sombra);
+}
+
+.tarjeta-edad h3 { font-size: 1.05rem; margin-bottom: 8px; color: var(--moss); }
+.tarjeta-edad p { margin: 0; color: var(--ink-suave); font-size: 0.95rem; }
+
+/* ---------- Mitos ---------- */
+.lista-mitos { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+
+.mito {
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 20px;
+  box-shadow: var(--sombra);
+}
+
+.mito summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 14px 0;
+  color: var(--dusk);
+  list-style: none;
+}
+
+.mito summary::-webkit-details-marker { display: none; }
+
+.mito summary::before {
+  content: "+";
+  color: var(--amber);
+  font-weight: 700;
+  margin-right: 10px;
+}
+
+.mito[open] summary::before { content: "–"; }
+
+.mito p { padding-bottom: 16px; color: var(--ink-suave); }
+
+/* ---------- Buenas prácticas ---------- */
+.lista-practicas {
+  margin-top: 24px;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lista-practicas li {
+  position: relative;
+  padding-left: 28px;
+  color: var(--ink-suave);
+}
+
+.lista-practicas li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--moss);
+}
+
+/* ---------- Cierre ---------- */
+.cierre {
+  background: var(--dusk);
+  color: var(--sand);
+  padding: 72px 0;
+  text-align: center;
+}
+
+.cierre__titulo { color: var(--sand); }
+.cierre__texto { color: rgba(244, 237, 225, 0.8); margin: 0 auto; }
+
+/* ---------- Fuentes ---------- */
+.fuentes-nota { color: var(--ink-suave); font-size: 0.92rem; }
+
+.lista-fuentes {
+  margin-top: 16px;
+  padding-left: 20px;
+  color: var(--ink-suave);
+  font-size: 0.92rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---------- Pie ---------- */
+.pie {
+  background: var(--sand-alt);
+  padding: 40px 0;
+  border-top: 1px solid rgba(22, 35, 58, 0.12);
+}
+
+.pie__grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pie__escuela {
+  font-family: var(--fuente-titulo);
+  color: var(--dusk);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.pie__curso { margin: 4px 0 0; color: var(--ink-suave); font-size: 0.88rem; }
+
+.pie__autoria { text-align: right; }
+.pie__etiqueta { margin: 0; font-size: 0.78rem; color: var(--ink-suave); text-transform: none; }
+.pie__nombre { margin: 2px 0 0; font-family: var(--fuente-titulo); color: var(--coral); font-size: 1.1rem; }
+.pie__extra { margin: 6px 0 0; font-size: 0.82rem; color: var(--ink-suave); }
+
+/* ---------- Botón volver arriba ---------- */
+.boton-arriba {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: var(--dusk);
+  color: var(--amber);
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 300;
+}
+
+.boton-arriba.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 860px) {
+  .nav-escritorio { display: none; }
+  .boton-menu { display: flex; }
+  .presentacion__grid { grid-template-columns: 1fr; }
+  .presentacion__aparte { order: -1; max-width: 360px; }
+  .ficha-proyecto { gap: 20px 32px; }
+  .tarjetas-enfermedad { grid-template-columns: 1fr; }
+  .tarjetas-edad { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .contenedor { padding: 0 18px; }
+  .hero { padding: 40px 0 48px; }
+  .seccion { padding: 48px 0; }
+  .pie__grid { flex-direction: column; align-items: flex-start; }
+  .pie__autoria { text-align: left; }
+}
