@@ -1,0 +1,6 @@
+FOTOGRAFÍAS DEL PROYECTO
+
+- evidencia-laboratorio.jpg: foto de la Sección 04 (Nuestra evidencia).
+- Para agregar más fotos: guárdalas en esta carpeta (JPG o WebP, máx. ~300 KB) y en index.html,
+  dentro de <figure class="evidencia">, añade otra línea:
+  <img src="img/nombre.jpg" alt="Descripción de lo que se ve" loading="lazy">
